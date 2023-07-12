@@ -1,0 +1,139 @@
+﻿@model ShoppingCart
+
+<form method="post">
+    <div class="card  container">
+        <div class="card-header bg-primary text-light ml-0  row ">
+            <div class="col-12 col-md-6">
+                <h1 class="text-white-50">@Model.ProductSize?.Product?.Title</h1>
+                <p class="text-warning">@Model.ProductSize?.Product?.Category?.Name</p>
+            </div>
+            <div class="col-12 col-md-6 text-end pt-4">
+                <span class="badge bg-warning pt-2" style="height:30px;">@Model.ProductSize.Product.Category.Name</span>
+            </div>
+        </div>
+
+        <div class="card-body row container">
+            <div class="container rounded p-2">
+                <div class="row">
+                    <div class="col-8 col-lg-8">
+                        <div class="row pl-2">
+                            <h5 class="text-muted">@Model.ProductSize.Product.Category?.Name</h5>
+                        </div>
+                        <!-- Display Sizes and Quantities -->
+                        <div class="row pl-2 mb-3">
+                            <div class="col-md-4 d-flex align-items-center">
+                                <label class="input-group-text  bg-primary text-white border-0 fw-semibold me-2" for="sizeSelect" style="width: auto; min-width: 110px;">
+                                    Размер
+                                </label>
+                                <select class="form-select" id="sizeSelect" name="selectedSize" style="width: auto; min-width: 270px;">
+                                    @foreach (var size in Model.ProductSize.Product.ProductSize)
+                                    {
+                                        <option value="@size.SizeName" data-max-quantity="@size.Quantity" data-product-size-id="@size.Id">@size.SizeName - В наличии: @size.Quantity штук</option>
+                                    }
+                                </select>
+
+                                @*<select class="form-select" id="sizeSelect" name="selectedSize" style="width: auto; min-width: 270px;">
+                                    @foreach (var size in Model.ProductSize.Product.ProductSize)
+                                    {
+                                        <option value="@size.SizeName" data-max-quantity="@size.Quantity">@size.SizeName - В наличии: @size.Quantity штук</option>
+                                    }
+                                </select>*@
+                            </div>
+                        </div>
+                        <!-- End Display Sizes and Quantities -->
+                        <div class="row ps-2">
+                            <h6 class="text-dark text-opacity-50  pb-2">
+                                Цена:
+                                <span class="text-decoration-line-through">
+                                    @Model.ProductSize.Product.Price.ToString("c")
+                                </span>
+                            </h6>
+                        </div>
+                        <div class="row text-center ps-2">
+                            <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
+                                <div class="text-dark text-opacity-50 fw-semibold">Количество</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
+                                <div class="text-dark text-opacity-50 fw-semibold">1-20</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
+                                <div class="text-dark text-opacity-50 fw-semibold">21-50</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
+                                <div class="text-dark text-opacity-50 fw-semibold">51-100</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white border-bottom">
+                                <div class="text-dark text-opacity-50 fw-semibold">100+</div>
+                            </div>
+                        </div>
+                        <div class="row text-center ps-2">
+                            <div class="p-1 col-3 col-lg-2 bg-white text-warning fw-bold">
+                                <div>Цена</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white text-warning fw-bold">
+                                <div>@Model.ProductSize.Product.Price.ToString("c")</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white text-warning fw-bold">
+                                <div>@Model.ProductSize.Product.Price20.ToString("c")</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white text-warning fw-bold">
+                                <div>@Model.ProductSize.Product.Price50.ToString("c")</div>
+                            </div>
+                            <div class="p-1 col-3 col-lg-2 bg-white text-warning fw-bold">
+                                <div>@Model.ProductSize.Product.Price100.ToString("c")</div>
+                            </div>
+                        </div>
+                        <div class="row pl-2">
+                            <p class="text-secondary">@Html.Raw(Model.ProductSize.Product.Description)</p>
+                        </div>
+                        <div class="row pl-2">
+                            <div class="col-8 text-primary"><h4>Количество</h4></div>
+                            <div class="col-5"><input asp-for="Count" class="form-control" /></div>
+                        </div>
+                    </div>
+                    <div class="col-12 col-lg-3 offset-lg-1 text-center">
+                        <img src="@Model.ProductSize.Product.ImageUrl" width="100%" class="rounded" />
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer">
+            <div class="row">
+                <div class="col-12 col-md-6 pb-1">
+                    <a class="btn btn-primary form-control " style="height:50px;" asp-action="Index">Назад</a>
+                </div>
+                <div class="col-12 col-md-6 pb-1">
+                    <button type="submit" value="Add to Cart" class="btn btn-success form-control" style="height:50px;">Добавить в корзину</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+
+            
+                    
+
+<script>
+    document.addEventListener('DOMContentLoaded', function () {
+        var quantityInput = document.querySelector('input[type="number"]');
+        var sizeSelect = document.getElementById('sizeSelect');
+
+        // Set initial maximum quantity based on the selected size
+        var selectedOption = sizeSelect.querySelector('option:checked');
+        var maxQuantity = parseInt(selectedOption.getAttribute('data-max-quantity'));
+        quantityInput.setAttribute('max', maxQuantity);
+
+        // Update maximum quantity when the selected size changes
+        sizeSelect.addEventListener('change', function () {
+            selectedOption = this.querySelector('option:checked');
+            maxQuantity = parseInt(selectedOption.getAttribute('data-max-quantity'));
+            quantityInput.setAttribute('max', maxQuantity);
+
+            // Reset the quantity value if it exceeds the new maximum
+            if (parseInt(quantityInput.value) > maxQuantity) {
+                quantityInput.value = maxQuantity;
+            }
+        });
+    });
+</script>

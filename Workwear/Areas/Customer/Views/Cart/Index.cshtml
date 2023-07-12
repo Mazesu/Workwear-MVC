@@ -1,0 +1,141 @@
+﻿@model ShoppingCartVM
+
+<form method="post">
+    <br />
+    <div class="container">
+        <div class="card">
+            <div class="card-header bg-dark text-light ml-0">
+                <div class="row">
+                    <div class="col-6  pt-2">
+                        <i class="fa fa-shopping-cart"></i> &nbsp;
+                        Корзина
+                    </div>
+                    <div class="col-6 text-end">
+                        <a asp-area="Customer" asp-controller="Home" asp-action="Index" class="btn btn-outline-info btn-sm">Продолжить покупки</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-body">
+                @foreach (var item in Model.ShoppingCartList)
+                {
+                    if (item.ProductSize != null && item.ProductSize.Product != null)
+                    {
+                        <div class="row">
+                            <div class="d-none d-lg-block col-lg-1 text-center py-2">
+                                <img src="@item.ProductSize.Product.ImageUrl" class="rounded" width="100%" />
+                            </div>
+                            <div class="col-12 col-lg-6 pt-md-3">
+                                <h5 class="text-uppercase text-secondary"><strong>@item.ProductSize.Product.Title</strong></h5>
+                                <p class="product-size">Размер: @item.Size</p>
+                            </div>
+                            <div class="col-12 col-lg-5 text-center row">
+                                <div class="col-3 text-md-right pt-2 pt-md-4">
+                                    <h6 class="fw-semibold">
+                                        @item.Price.ToString("c")
+                                        <span class="text-muted">&nbsp;x&nbsp;</span>
+                                        <span id="count-@item.Id">@item.Count</span>
+                                    </h6>
+                                </div>
+                                <div class="col-6 col-sm-4 col-lg-6 pt-2">
+                                    <div class="w-75 btn-group" role="group">
+                                        <a href="javascript:void(0);" onclick="increaseCount(@item.Id, @item.ProductSize.Quantity)" class="btn btn-outline-primary bg-gradient py-2">
+                                            <i class="bi bi-plus-square"></i>
+                                        </a> &nbsp;
+                                        <a href="javascript:void(0);" onclick="decreaseCount(@item.Id)" class="btn btn-outline-primary bg-gradient py-2">
+                                            <i class="bi bi-dash-square"></i>
+                                        </a>
+                                    </div>
+
+                                </div>
+                                <div class="col-3 col-sm-4 col-lg-2 offset-lg-1 text-right pt-2">
+                                    <a asp-action="remove" asp-route-cartId="@item.Id" class="btn btn-danger bg-gradient py-2 ">
+                                        <i class="bi bi-trash-fill"></i>
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                }
+                <hr />
+
+                <div class="row">
+                    <div class="col-12 col-md-6 offset-md-6 col-lg-4 offset-lg-8 pr-4">
+                        <ul class="list-group">
+                            <li class="list-group-item d-flex justify-content-between bg-light">
+                                <span class="text-info"> Сумма (РУБ)</span>
+                                <strong class="text-info">@Model.OrderHeader.OrderTotal.ToString("c")</strong>
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+
+            </div>
+
+            <div class="card-footer">
+                <div class="card-footer row">
+                    <div class="col-sm-12 col-lg-4 col-md-6 offset-lg-8 offset-md-6 ">
+                        <a asp-action="Summary" class="btn btn-success form-control">Оплатить</a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function increaseCount(cartId, maxQuantity) {
+            // Получаем текущее значение Count
+            var currentCount = parseInt(document.getElementById("count-" + cartId).innerText);
+
+            // Получаем максимальное количество товара
+            var maxCount = parseInt(maxQuantity);
+
+            // Проверяем, превышает ли текущее значение Count максимальное количество
+            if (currentCount >= maxCount) {
+                alert("Превышено максимальное количество товара.");
+                return;
+            }
+
+            // Если все в порядке, отправляем запрос на сервер для увеличения количества
+            fetch(`/customer/cart/plus?cartId=${cartId}`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Увеличиваем значение Count на 1 в представлении
+                        document.getElementById("count-" + cartId).innerText = currentCount + 1;
+                    } else {
+                        alert("Ошибка при увеличении количества товара.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Ошибка при выполнении запроса:", error);
+                    alert("Ошибка при увеличении количества товара.");
+                });
+        }
+
+        function decreaseCount(cartId) {
+            // Получаем текущее значение Count
+            var currentCount = parseInt(document.getElementById("count-" + cartId).innerText);
+
+            // Проверяем, не является ли текущее значение Count уже минимальным (например, 1)
+            if (currentCount <= 1) {
+                alert("Достигнуто минимальное количество товара.");
+                return;
+            }
+
+            // Если все в порядке, отправляем запрос на сервер для уменьшения количества
+            fetch(`/customer/cart/minus?cartId=${cartId}`, { method: 'POST' })
+                .then(response => {
+                    if (response.ok) {
+                        // Уменьшаем значение Count на 1 в представлении
+                        document.getElementById("count-" + cartId).innerText = currentCount - 1;
+                    } else {
+                        alert("Ошибка при уменьшении количества товара.");
+                    }
+                })
+                .catch(error => {
+                    console.error("Ошибка при выполнении запроса:", error);
+                    alert("Ошибка при уменьшении количества товара.");
+                });
+        }
+    </script>
+</form>

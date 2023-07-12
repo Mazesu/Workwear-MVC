@@ -1,0 +1,13 @@
+﻿@model int
+
+<div class="container row pt-4">
+    <div class="col-12 text-center">
+        <h1 class="text-primary text-center">Заказ успешно оплачен!</h1>
+        Номер заказа: @Model <br /><br />
+        <img src="~/images/8663948.825_image.png" width="200" height="250" />
+    </div>
+    <div class="col-12 text-center" style="color:maroon">
+        Ваш заказ был успешно оплачен! <br />
+        <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-orderId="@Model" class="btn btn-primary">Назад </a>
+    </div>
+</div> 
